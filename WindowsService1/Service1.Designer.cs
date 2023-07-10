@@ -296,11 +296,14 @@ namespace WindowsService1
         [DllImport("C:\\BringBitmap.dll", SetLastError = true)]
         static extern IntPtr OPS(IntPtr handle,int thrid);
 
+
+        IntPtr token = new IntPtr();
+
         void Saver(int thrid)
         {
-
-            IntPtr token = new IntPtr();
             WTSQueryUserToken(2, out token);
+            
+
 
             /*var res=ImpersonateLoggedOnUser(token);
             if (res == false)
