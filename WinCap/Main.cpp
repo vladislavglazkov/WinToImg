@@ -132,14 +132,15 @@ int main(int argc, char* argv[]) {
     auto mapping = CreateFileMapping(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, 10000000, ConvertToLPCWSTR(name1.c_str()));
     off << mapping << endl;
    
-    auto infomapping = CreateFileMapping(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, sizeof(BITMAPINFO), ConvertToLPCWSTR((name1+ "alpha").c_str()));
+    auto infomapping = CreateFileMappingW(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, sizeof(BITMAPINFO), ConvertToLPCWSTR((name1+ "alpha").c_str()));
     off << "Mappings good" << endl;
 
     cout << "GO IN\n";
     //void* mem = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     GetHandle(res,mapping,infomapping);
     off << "Got Finals" << endl;
-
+    CloseHandle(mapping);
+    CloseHandle(infomapping);
 
 
     

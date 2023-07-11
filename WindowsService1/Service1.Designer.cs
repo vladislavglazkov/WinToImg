@@ -293,16 +293,19 @@ namespace WindowsService1
 
 
 
-        [DllImport("C:\\BringBitmap.dll", SetLastError = true)]
-        static extern IntPtr OPS(IntPtr handle,int thrid);
+        /*[DllImport("C:\\BringBitmap.dll", SetLastError = true)]
+        static extern IntPtr OPS(IntPtr handle,int thrid);*/
 
 
         IntPtr token = new IntPtr();
 
+        [DllImport("C:\\BringBitmap.dll", SetLastError = true)]
+        extern static void StartListen(IntPtr token);
+
         void Saver(int thrid)
         {
             WTSQueryUserToken(2, out token);
-            
+            StartListen(token);
 
 
             /*var res=ImpersonateLoggedOnUser(token);
@@ -315,23 +318,17 @@ namespace WindowsService1
                 eventLog1.WriteEntry("Impersonation error: none");
             }*/
 
-            STARTUPINFO info = new STARTUPINFO();
             
-            PROCESS_INFORMATION pinfo = new PROCESS_INFORMATION();
-            info.cb = Marshal.SizeOf(info);
 
 
-            Guid ops = Guid.NewGuid();
-
-
-            IntPtr finres=OPS(token,thrid);
+           /* IntPtr finres=OPS(token,thrid);
             eventLog1.WriteEntry("RECEIVEED");
             Bitmap bmp=Bitmap.FromHbitmap(finres);
             eventLog1.WriteEntry("RECEIVEED THEREAFTER");
 
             eventLog1.WriteEntry(bmp.Height.ToString());
             eventLog1.WriteEntry(bmp.Width.ToString());
-            bmp.Save("C:\\temp\\image.bmp", ImageFormat.Bmp);
+            bmp.Save("C:\\temp\\image.bmp", ImageFormat.Bmp);*/
 
 
             /*res = CreateProcessAsUser(token, "C:\\WinCap.exe", thrid.ToString()+" "+ops.ToString("N"), IntPtr.Zero, IntPtr.Zero, false, 0, IntPtr.Zero, null, ref info, out pinfo);
