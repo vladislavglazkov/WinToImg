@@ -92,8 +92,39 @@ std::wstring GenerateGUIDString() {
 	return guidString;
 }
 
+struct Empty {
+private: int _empty;
+};
+struct DeleteCallbackData {
+	HANDLE map1, map2;
+};
+Empty DeleteCallback(Empty data, void* argsraw) {
+	DeleteCallbackData* args = (DeleteCallbackData*)argsraw;
+	CloseHandle(args->map1);
+	CloseHandle(args->map2);
+	delete args;
+	return Empty();
+}
+
+DWORD WINAPI TEST(LPVOID arg) {
+	globallog << "TEST PASSED" << endl;
+	return 0;
+}
+
+void CleanUpNameCallback(void* arg) {
+	delete[] arg;
+	globallog << L"Released\n";
+}
 
 Down Callback(Up data, void* argsraw) {
+
+	/*CallbackArgs* cbcargs = new CallbackArgs();
+	cbcargs->token = NULL;
+	AcceptViaPipe<Up, Down>(L"WTI-PIPE-DELETE-A12B662", 1, false, Callback, cbcargs);*/
+	
+
+
+
 	globallog << 123 << endl;
 	CallbackArgs* args=(CallbackArgs*)argsraw;
 	SECURITY_DESCRIPTOR desc;
@@ -140,19 +171,33 @@ Down Callback(Up data, void* argsraw) {
 	ZeroMemory(&ans, sizeof(ans));
 	guid.copy(&(ans.guid[0]), guid.length());
 
+
+	DeleteCallbackData* d3 = new DeleteCallbackData();
+	d3->map1 = 0;
+	d3->map2 = 0;
+	//AcceptViaPipe<Up, Down>(L"WTI-PIPE-DELETE-A12B66234", 1, false, Callback, d3);
+
+
+	DeleteCallbackData* d2 = new DeleteCallbackData();
+	d2->map1 = mapping;
+	d2->map2 = infomapping;
+	wstring forcbc = L"WTI-PIPE-DELETE-" + guid;
+	wchar_t* forcbcbuf = new wchar_t[forcbc.length() + 1];
+	CopyMemory(forcbcbuf, &forcbc[0], (sizeof(wchar_t)) * (forcbc.length() + 1));
+	AcceptViaPipe<Empty, Empty>(forcbcbuf, 1, false, DeleteCallback, d2, CleanUpNameCallback, forcbcbuf);
 	
-
-
 	return ans;
 
 
 }
 
+
 extern "C" __declspec(dllexport) void StartListen(HANDLE token) {
 	CallbackArgs* cbcargs = new CallbackArgs();
 	cbcargs->token = token;
 	
-
-	AcceptViaPipe<Up,Down>(L"WTI-PIPE-MAIN", 30, Callback,cbcargs);
+	typedef void (*FunPtr)(void*);
+	FunPtr nptr = 0;
+	AcceptViaPipe<Up,Down>(L"WTI-PIPE-MAIN", 30,true, Callback,cbcargs,nptr,NULL);
 
 }

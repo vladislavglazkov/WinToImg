@@ -100,7 +100,8 @@ void GetHandle(int thrid,void*mapping,void*infomapping) {
     DeleteObject(hbmp);
     DeleteDC(bmpdc);
     ReleaseDC(hwnd, windc);
-
+    CloseHandle(mapping);
+    CloseHandle(infomapping);
     
 
     return;
