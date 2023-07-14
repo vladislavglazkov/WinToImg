@@ -1,0 +1,94 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+    <Package  Name="WTI_Installer1" Manufacturer="TODO Manufacturer"  Version="1.0.0.0" UpgradeCode="e8ed9952-c1e5-4f82-b4b4-5fa2b6825bb3">
+      <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+
+      <Media Id='1' Cabinet='Sample.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
+      <Property Id='DiskPrompt' Value="Acme's Foobar 1.0 Installation [1]" />
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+        <Directory Id='ProgramFiles64Folder' Name='PFiles'>
+          <Directory Id='VladislavGlazkov' Name='VG'>
+            <Directory Id='PACK1' Name='PACK1'>
+              <Component Id='Maincomponent' Guid='19019212-83F1-4F22-985B-FDB3C8ABD471'>
+                <File Id='HJSON' Name='history.json' Source='ops/history.json' KeyPath='yes' DiskId='1'></File>
+                <Shortcut Id="UninstallProduct"
+            Name="Uninstall My Application"
+            Target="[SystemFolder]msiexec.exe"
+            Arguments="/x [ProductCode]"
+            Description="Uninstalls My Application" />
+                
+
+              </Component>
+
+              <Component Id="CMP2" Guid="163b41a3-3619-403a-b2c9-45d4857a3948">
+
+                <File Id='UserOpsExe' Name='UserOps.exe' Source='UserOps.exe' KeyPath='yes' DiskId='1'></File>
+                
+              </Component>
+              
+              
+             
+
+              
+            </Directory>
+
+          </Directory>
+        </Directory>
+
+      </Directory>
+
+
+      <Feature Id="Main" Level="1">
+        <ComponentRef Id="Maincomponent"/>
+        <ComponentGroupRef Id="Reg"/>
+        <ComponentRef Id="CMP2"/>
+
+      </Feature>
+
+      <CustomActionRef Id="CustomAction"/>
+      <InstallExecuteSequence>
+         
+        <Custom Condition='NOT Installed' Action="CustomAction" Sequence="4010"/>
+        <Custom Condition='Installed and REMOVE="ALL"' Action='CustomActionRemove' Sequence='2590'/>
+      </InstallExecuteSequence>
+        
+      <ui:WixUI Id="WixUI_Ops" />
+
+
+    
+    </Package>
+
+  <Fragment>
+
+    <ComponentGroup Id="Reg">
+      <Component Id="RegDomain" Directory="PACK1" Guid="f45ed9a4-8f9b-457c-99c3-ede9ec5395be">
+        <RegistryKey Root="HKLM" Key="Software\WTI">
+          <RegistryValue Name="domain" Type="string" KeyPath="yes" Value="[DOMAINVALUE]">
+          </RegistryValue>
+        </RegistryKey>
+      </Component>
+
+      <Component Directory="PACK1" Id="RegUsername" Guid="09978105-acfe-4e82-86ce-87953bcdb9af">
+        <RegistryKey Root="HKLM" Key="Software\WTI">
+          <RegistryValue Name="username" Type="string" KeyPath="yes" Value="[USERVALUE]">
+          </RegistryValue>
+        </RegistryKey>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+    <Fragment>
+      <Property Secure="yes" Id="DOMAINVALUE" Value="winserver.localops"></Property>
+      <Property Secure="yes" Id="USERVALUE" Value="Not Set"></Property>
+
+      <!--- <Binary Id="Exec" SourceFile="Debug/net472/CustomAction1.CA.dll"></Binary>
+      <Property Id="CustomAction" Value="domain=[DOMAINVALUE];username=[USERVALUE]" />  
+
+      <CustomAction Execute="deferred" Impersonate="yes" DllEntry="CustomAction1" Id="CustomAction" BinaryRef="Exec"/>   -->
+
+
+      <CustomAction Execute="deferred" Impersonate="yes"  Id="CustomAction" Return="check" Directory="PACK1" ExeCommand='"[PACK1]UserOps.exe" register [DOMAINVALUE] [USERVALUE]'/>
+      <CustomAction Execute="deferred" Impersonate="yes"  Id="CustomActionRemove" Return="check" Directory="PACK1" ExeCommand='"[PACK1]UserOps.exe" unregister'/>
+      
+    </Fragment>
+</Wix>

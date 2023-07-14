@@ -1,0 +1,147 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<!--
+First-time install dialog sequence:
+ - WixUI_WelcomeEulaDlg
+
+Maintenance dialog sequence:
+ WixUI_MaintenanceWelcomeDlg
+ - WixUI_MaintenanceTypeDlg
+ - WixUI_VerifyReadyDlg
+
+Patch dialog sequence:
+ - WixUI_WelcomeDlg
+ - WixUI_VerifyReadyDlg
+-->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  
+
+  <Fragment>
+    <UI Id="WixUI_Ops_X64">
+       <Dialog Id="WelcomeEulaDlg2" Width="370" Height="270" Title="!(loc.WelcomeEulaDlg_Title)">
+                <Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" TabSkip="no" Text="!(loc.WelcomeEulaDlgBitmap)" />
+                <Control Id="Title" Type="Text" X="130" Y="6" Width="225" Height="30" Transparent="yes" NoPrefix="yes" Text="!(loc.WelcomeEulaDlgTitle)" />
+                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+         <Control Id="LicenseAcceptedCheckBox" Type="CheckBox" X="130" Y="207" Width="226" Height="18" CheckBoxValue="1" Property="LicenseAccepted" Text="!(loc.WelcomeEulaDlgLicenseAcceptedCheckBox)">
+           
+          
+         </Control>
+                    
+                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+                    <Publish Event="SpawnDialog" Value="CancelDlg"></Publish>
+                     
+                </Control>
+                    
+                <Control Id="LicenseText" Type="ScrollableText" X="130" Y="36" Width="226" Height="162" Sunken="yes" TabSkip="no">
+                  <Text SourceFile="License.rtf"></Text>
+                </Control>
+         <Control Id="GoAhead" DisableCondition="NOT LicenseAccepted" EnableCondition="LicenseAccepted" Type="PushButton"  X="200" Y="243" Width="56" Height="17" Text="Continuado">
+           
+      
+         </Control>
+       
+            </Dialog>
+      
+           
+        
+      <Dialog Id="GetParamsData" Width="370" Height="270" Title="Please enter values">
+          <Control Id="GoAhead2" Type="PushButton"  X="200" Y="243" Width="56" Height="17" Text="Continuado">
+                          <Publish Event="EndDialog" Value="Return"></Publish>
+          </Control>
+           <Control Id="GetDomainValue" Type="Edit" Property="DOMAINVALUE" X="70" Y="100" Width="200" Height="17"/>
+        <Control Id="GetUserValue" Type="Edit" Property="USERVALUE" X="70" Y="125" Width="200" Height="17"/>
+
+
+      </Dialog>
+      
+       <Dialog Modeless="yes" Id="Progdiag2" Width="370" Height="270" Title="Wait for the installation to complete">
+          <Control TabSkip="no" X="10" Y="10" Height="100" Width="100" Id="ProgressDialog.Text" Type="Text" Text="Stand by"></Control>
+      
+      </Dialog>
+      
+      
+      <Dialog  Id="Finite" Width="370" Height="270" Title="Wait for the installation to complete">
+          
+                <Control TabSkip="no" X="10" Y="10" Height="100" Width="100" Id="ProgressDialog.Text" Type="Text" Text="Thanks for installation"></Control>
+
+      </Dialog>
+      <Dialog  Id="Err" Width="370" Height="270" Title="Error occured!" ErrorDialog="yes">
+           
+<Control Id="ErrorText" Type="Text" X="48" Y="15" Width="205" Height="60" TabSkip="no" NoPrefix="yes" Text="Error occured" />
+                <Control Id="Y" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIYes)">
+                    <Publish Event="EndDialog" Value="ErrorYes" />
+                </Control>
+                <Control Id="A" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUICancel)">
+                    <Publish Event="EndDialog" Value="ErrorAbort" />
+                </Control>
+                <Control Id="C" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUICancel)">
+                    <Publish Event="EndDialog" Value="ErrorCancel" />
+                </Control>
+                <Control Id="ErrorIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
+                <Control Id="I" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIIgnore)">
+                    <Publish Event="EndDialog" Value="ErrorIgnore" />
+                </Control>
+                <Control Id="N" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUINo)">
+                    <Publish Event="EndDialog" Value="ErrorNo" />
+                </Control>
+                <Control Id="O" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIOK)">
+                    <Publish Event="EndDialog" Value="ErrorOk" />
+                </Control>
+                <Control Id="R" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIRetry)">
+                    <Publish Event="EndDialog" Value="ErrorRetry" />
+                </Control>
+      </Dialog>
+      
+      
+      <Dialog Width="370" Height="270" Title="Already installed!" Id="AlreadyInstalled">
+        
+          <Control TabSkip="no" X="10" Y="10" Height="100" Width="100" Id="ProgressDialog.Text" Type="Text" Text="The package has already been installed"></Control>
+
+      </Dialog>
+      
+      <Property Id="ErrorDialog" Value="Err" />
+
+      
+      <Publish Dialog="WelcomeEulaDlg2" Event="NewDialog" Value="GetParamsData" Control="GoAhead"></Publish>
+      
+      
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+            <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+            <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+            <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+            <Property Id="WixUI_Mode" Value="Minimal" />
+            <DialogRef Id="FatalError" />
+            <DialogRef Id="FilesInUse" />
+            
+           
+            <DialogRef Id="UserExit" />
+            <DialogRef Id="ExitDialog"></DialogRef>
+
+            <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return"></Publish>
+
+           
+
+            <InstallUISequence>
+
+              <Show Dialog="WelcomeEulaDlg2" Sequence="1" Condition="NOT Installed" ></Show>
+              <Show Dialog="AlreadyInstalled" Sequence="1" Condition="Installed" ></Show>
+
+            
+               <Show Dialog="Progdiag2" Sequence="2" ></Show>
+
+            </InstallUISequence>
+      
+            <AdminUISequence>
+              <Show Dialog="AlreadyInstalled" Sequence="1" ></Show>
+
+               <Show Dialog="Progdiag2" Sequence="2" ></Show>
+            </AdminUISequence>
+           
+<UIRef Id="WixUI_Common" />
+        </UI>
+
+    
+  </Fragment>
+</Wix>
