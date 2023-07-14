@@ -8,6 +8,15 @@
     <None Include="UserManage.dll" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="WixToolset.Heat" Version="4.0.1" />
     <PackageReference Include="WixToolset.UI.wixext" Version="4.0.1" />
   </ItemGroup>
+ <!-- <ItemGroup>
+    <HarvestDirectory Include="ServiceFolder" OutputFile="heat.wxs">
+      <ComponentGroupName>ServiceComponent</ComponentGroupName>
+      <DirectoryRefId>ServiceDir</DirectoryRefId>
+      <SuppressRootDirectory>true</SuppressRootDirectory>
+    </HarvestDirectory>
+    <BindPath Include="ServiceFolder" /> 
+  </ItemGroup> -->
 </Project>

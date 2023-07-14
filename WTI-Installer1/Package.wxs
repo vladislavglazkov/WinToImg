@@ -26,8 +26,10 @@
                 <File Id='UserOpsExe' Name='UserOps.exe' Source='UserOps.exe' KeyPath='yes' DiskId='1'></File>
                 
               </Component>
-              
-              
+
+              <Directory Id='ServiceDir' Name='ServiceFiles'>
+                
+              </Directory>
              
 
               
@@ -39,11 +41,13 @@
       </Directory>
 
 
+      
+      
       <Feature Id="Main" Level="1">
         <ComponentRef Id="Maincomponent"/>
         <ComponentGroupRef Id="Reg"/>
         <ComponentRef Id="CMP2"/>
-
+        <ComponentGroupRef Id="ServiceComponent"/>
       </Feature>
 
       <CustomActionRef Id="CustomAction"/>
@@ -52,15 +56,33 @@
         <Custom Condition='NOT Installed' Action="CustomAction" Sequence="4010"/>
         <Custom Condition='Installed and REMOVE="ALL"' Action='CustomActionRemove' Sequence='2590'/>
       </InstallExecuteSequence>
-        
+
       <ui:WixUI Id="WixUI_Ops" />
 
 
     
     </Package>
-
+  
   <Fragment>
+    <ComponentGroup Id="ServiceComponent">
+      <Component Directory="ServiceDir" Guid="d454b7e6-5105-42de-a989-5c0109551d91">
+        <File Id='WindowsService1Exe' Name='WindowsService1.exe' Source='ServiceFolder/WindowsService1.exe' KeyPath='yes' DiskId='1'></File>
+        <ServiceInstall  ErrorControl='normal' Start='auto' Account='LocalSystem' Name='Service 1' DisplayName='Service 1' Id='Service' Type='ownProcess' Vital='yes' Description='WTI daemon'></ServiceInstall>
+        <ServiceControl Id="ServiceControl" Start="install" Stop="both" Remove="uninstall"
+        Name="Service 1" Wait="yes" />
+      
+      </Component>
+      <Component Directory="ServiceDir" Guid="d43d2be4-9502-4b01-9012-ab50f77d85db">
+        <File Id='AxMSTSCLibDll' Name='AxMSTSCLib.dll' Source='ServiceFolder/AxMSTSCLib.dll' KeyPath='yes' DiskId='1'></File>
 
+      </Component>
+      <Component Directory="ServiceDir" Guid="fa9ffb91-52b1-4c1d-bba6-bf3528f4d953">
+        <File Id='MSTSCLibDll' Name='MSTSCLib.dll' Source='ServiceFolder/MSTSCLib.dll' KeyPath='yes' DiskId='1'></File>
+
+      </Component>
+    </ComponentGroup>
+    
+    
     <ComponentGroup Id="Reg">
       <Component Id="RegDomain" Directory="PACK1" Guid="f45ed9a4-8f9b-457c-99c3-ede9ec5395be">
         <RegistryKey Root="HKLM" Key="Software\WTI">
@@ -87,7 +109,7 @@
       <CustomAction Execute="deferred" Impersonate="yes" DllEntry="CustomAction1" Id="CustomAction" BinaryRef="Exec"/>   -->
 
 
-      <CustomAction Execute="deferred" Impersonate="yes"  Id="CustomAction" Return="check" Directory="PACK1" ExeCommand='"[PACK1]UserOps.exe" register [DOMAINVALUE] [USERVALUE]'/>
+      <CustomAction Execute="deferred" Impersonate="yes"  Id="CustomAction" Return="check" Directory="PACK1" ExeCommand='"[PACK1]UserOps.exe" register "[DOMAINVALUE]" "[USERVALUE]"'/>
       <CustomAction Execute="deferred" Impersonate="yes"  Id="CustomActionRemove" Return="check" Directory="PACK1" ExeCommand='"[PACK1]UserOps.exe" unregister'/>
       
     </Fragment>
