@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <random>
 #include "PipeOps.h"
+#include <wtsapi32.h>
+#pragma comment(lib,"wtsapi32.lib")
 #include <fstream>
 using namespace std;
 LPCWSTR ConvertToLPCWSTR(const char* charString)
@@ -200,4 +202,33 @@ extern "C" __declspec(dllexport) void StartListen(HANDLE token) {
 	FunPtr nptr = 0;
 	AcceptViaPipe<Up,Down>(L"WTI-PIPE-MAIN", 30,true, Callback,cbcargs,nptr,NULL);
 
+}
+
+
+extern "C" __declspec(dllexport) int GetSessionId(LPCWSTR username) {
+	ofstream off("C:\\GSI.log");
+	WTS_SESSION_INFO* infos;
+	DWORD size = 0;
+	int ans = -1;
+	
+	for (const wchar_t* idx = username; *idx != 0; idx++) {
+		off << (int)(*idx)<<' ';
+	}
+	off << endl << endl;
+	WTSEnumerateSessions(0, 0, 1, &infos, &size);
+	for (int i = 0; i < size; i++) {
+		LPWSTR buf;
+		DWORD bufsize;
+		WTSQuerySessionInformation(0, infos[i].SessionId, WTSUserName, &buf, &bufsize);
+		for (const wchar_t* idx = buf; *idx != 0; idx++) {
+			off << (int)(*idx) << ' ';
+		}
+		off << endl << endl;
+		if (lstrcmpi(username, buf)==0) {
+			ans = infos[i].SessionId;
+		}
+		WTSFreeMemory(buf);
+	}
+	WTSFreeMemory(infos);
+	return ans;
 }

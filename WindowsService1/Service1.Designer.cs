@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using static WindowsService1.Service1;
 using System.IO.MemoryMappedFiles;
 using System.Drawing.Imaging;
-
+using Microsoft.Win32;
 namespace WindowsService1
 {
     partial class Service1
@@ -38,6 +38,16 @@ namespace WindowsService1
         /// </summary>
         /// System.Diagnostics.EventLog
         /// 
+
+
+        private static string GetRegParam(string param)
+        {
+            string route = "HKEY_LOCAL_MACHINE\\SOFTWARE\\WTI";
+            return (string)Registry.GetValue(route, param, default);
+
+            
+        }
+        private string username;
         static System.Diagnostics.EventLog eventLog1;
         private void InitializeComponent()
         {
@@ -98,12 +108,13 @@ namespace WindowsService1
             form.BeginInvoke(min);
             form.Show();
 
-            rdpConnection.Server = "winserver.localops";
-            rdpConnection.Domain = "WINSERVER";
-            rdpConnection.UserName = "vladi";
+            rdpConnection.Server = GetRegParam("domain");
+            rdpConnection.Domain = rdpConnection.Server;
+            rdpConnection.UserName = GetRegParam("username");
+            this.username= rdpConnection.UserName;
             rdpConnection.DesktopHeight = 500;
             rdpConnection.DesktopWidth = 500;
-            rdpConnection.AdvancedSettings9.ClearTextPassword = "1234321aA";
+            rdpConnection.AdvancedSettings9.ClearTextPassword = "aA1234321";
             rdpConnection.AdvancedSettings9.EnableCredSspSupport = true;
             rdpConnection.OnConnected += RdpConnection_OnConnected;
             rdpConnection.OnConnecting += RdpConnection_OnConnecting;
@@ -112,6 +123,7 @@ namespace WindowsService1
             //rdpConnection.ClientSize = new System.Drawing.Size(500, 500);
             rdpConnection.Connect();
             
+
             Application.Run();
 
         }
@@ -212,16 +224,20 @@ namespace WindowsService1
         );
 
 
+        [DllImport("C:\\BringBitmap.dll")]
+        public static extern int GetSessionId([MarshalAs(UnmanagedType.LPWStr)]string name);
+
 
         private void RdpConnection_OnConnected(object sender, EventArgs e)
         {
-
-
             Thread.Sleep(5000);
+
+            int sessionId = GetSessionId(username);
+            eventLog1.WriteEntry($"For username {username} SessionID obtained: {sessionId}");
             eventLog1.WriteEntry("Hey-hey");
             IntPtr token=new IntPtr();
             int error;
-            bool res=WTSQueryUserToken(2,out token);
+            bool res=WTSQueryUserToken(sessionId,out token);
             error=Marshal.GetLastWin32Error();
             if (res == false)
             {
@@ -232,28 +248,14 @@ namespace WindowsService1
                 eventLog1.WriteEntry("Error on UserToken Request: none");
 
             }
-            unsafe
-            {
-                STARTUPINFO info = new STARTUPINFO();
-                PROCESS_INFORMATION pinfo = new PROCESS_INFORMATION();
-                info.cb=Marshal.SizeOf(info);
-                res=CreateProcessAsUser(token, "notepad.exe", null, IntPtr.Zero, IntPtr.Zero, false, 0, IntPtr.Zero, null, ref info, out pinfo);
-                if (res != false)
-                {
-                    eventLog1.WriteEntry("Notepad creation: success");
+            
+            
+
+             var thr = new Thread(() => { Saver(); });
+             thr.Start();
 
 
-                }
-                else
-                {
-                    eventLog1.WriteEntry("Notepad creation error: " + Marshal.GetLastWin32Error().ToString());
-                }
-
-                var thr = new Thread(() => { Saver(pinfo.dwThreadId); });
-                thr.Start();
-
-
-            }
+            
         }
 
 
@@ -302,7 +304,7 @@ namespace WindowsService1
         [DllImport("C:\\BringBitmap.dll", SetLastError = true)]
         extern static void StartListen(IntPtr token);
 
-        void Saver(int thrid)
+        void Saver()
         {
             WTSQueryUserToken(2, out token);
             StartListen(token);
