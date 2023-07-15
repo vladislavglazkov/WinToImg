@@ -235,7 +235,7 @@ namespace WindowsService1
             int sessionId = GetSessionId(username);
             eventLog1.WriteEntry($"For username {username} SessionID obtained: {sessionId}");
             eventLog1.WriteEntry("Hey-hey");
-            IntPtr token=new IntPtr();
+            token=new IntPtr();
             int error;
             bool res=WTSQueryUserToken(sessionId,out token);
             error=Marshal.GetLastWin32Error();
@@ -306,7 +306,14 @@ namespace WindowsService1
 
         void Saver()
         {
-            WTSQueryUserToken(2, out token);
+
+            eventLog1.WriteEntry($"Before {token}");
+
+            //bool res=WTSQueryUserToken(2, out token);
+
+            eventLog1.WriteEntry($"After {token}");
+
+
             StartListen(token);
 
 

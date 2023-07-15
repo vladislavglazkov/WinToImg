@@ -48,16 +48,21 @@ namespace UserOps
         }
         static void Clear()
         {
+
             string route = "HKEY_LOCAL_MACHINE\\SOFTWARE\\WTI";
             string domain = (string)Registry.GetValue(route, "domain", default);
             Console.WriteLine(route);
             Console.WriteLine(domain);
             string username = (string)Registry.GetValue(route, "username", default);
-
-            using (var context = new PrincipalContext(ContextType.Domain, domain))
+            try
             {
-                UserPrincipal.FindByIdentity(context, username).Delete();
+                using (var context = new PrincipalContext(ContextType.Domain, domain))
+                {
+                    UserPrincipal.FindByIdentity(context, username).Delete();
+                }
             }
+            catch { }
+            
         }
 
         static int Main(string[] args)

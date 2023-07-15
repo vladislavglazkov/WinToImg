@@ -27,31 +27,51 @@ Patch dialog sequence:
            
           
          </Control>
-                    
-                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
-                    <Publish Event="SpawnDialog" Value="CancelDlg"></Publish>
-                     
-                </Control>
+
+        
+         
+         <Control Id="Canceller" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+           <Publish Event="EndDialog" Value="Exit" />
+         </Control>
                     
                 <Control Id="LicenseText" Type="ScrollableText" X="130" Y="36" Width="226" Height="162" Sunken="yes" TabSkip="no">
                   <Text SourceFile="License.rtf"></Text>
                 </Control>
-         <Control Id="GoAhead" DisableCondition="NOT LicenseAccepted" EnableCondition="LicenseAccepted" Type="PushButton"  X="200" Y="243" Width="56" Height="17" Text="Continuado">
-           
-      
+
+         <Control DisableCondition="NOT LicenseAccepted" EnableCondition="LicenseAccepted" Id="GoAhead" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="Next" >
+           <Publish Event="NewDialog" Value="GetParamsData"></Publish>
+
          </Control>
+        
        
             </Dialog>
       
            
         
       <Dialog Id="GetParamsData" Width="370" Height="270" Title="Please enter values">
-          <Control Id="GoAhead2" Type="PushButton"  X="200" Y="243" Width="56" Height="17" Text="Continuado">
-                          <Publish Event="EndDialog" Value="Return"></Publish>
-          </Control>
-           <Control Id="GetDomainValue" Type="Edit" Property="DOMAINVALUE" X="70" Y="100" Width="200" Height="17"/>
-        <Control Id="GetUserValue" Type="Edit" Property="USERVALUE" X="70" Y="125" Width="200" Height="17"/>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="Next" >
+          <Publish Event="EndDialog" Value="Return"></Publish>
 
+        </Control>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="Back">
+          <Publish Event="NewDialog" Value="WelcomeEulaDlg2"></Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="EndDialog" Value="Exit" />
+        </Control>
+
+        
+           <Control Id="GetDomainValue" Type="Edit" Property="DOMAINVALUE" X="50" Y="100" Width="150" Height="17"/>
+           <Control Id="GetDomainValueDesc" Type="Text" Text="Enter your domain name" X="220" Y="100" Width="150" Height="17"></Control>
+           <Control Id="GetUserValue" Type="Edit" Property="USERVALUE" X="50" Y="125" Width="150" Height="17"/>
+        <Control Id="GetUserValueDesc" Type="Text" Text="Enter the username to be created for internal use"  X="220" Y="125" Width="150" Height="40"></Control>
+
+        <Control Id="Screensizedesc" Type="Text" Text="Specify your virtual screen size (if the window requested does not fit into the screen, it will not be captured)" X="70" Y="160" Width="150" Height="50"></Control>
+
+        <Control Id="GetXValue" Type="Edit" Property="XVALUE" X="80" Y="210" Width="50" Height="17"/>
+        <Control Id="GetYValue" Type="Edit" Property="YVALUE" X="160" Y="210" Width="50" Height="17"/>
+
+        <Control Id="TextSeparator" Type="Text" Text="X" X="140" Y="210" Width="10" Height="17"></Control>
 
       </Dialog>
       
@@ -95,7 +115,10 @@ Patch dialog sequence:
       
       
       <Dialog Width="370" Height="270" Title="Already installed!" Id="AlreadyInstalled">
-        
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="Continue" >
+          <Publish Event="EndDialog" Value="Exit"></Publish>
+
+        </Control>
           <Control TabSkip="no" X="10" Y="10" Height="100" Width="100" Id="ProgressDialog.Text" Type="Text" Text="The package has already been installed"></Control>
 
       </Dialog>
@@ -103,7 +126,6 @@ Patch dialog sequence:
       <Property Id="ErrorDialog" Value="Err" />
 
       
-      <Publish Dialog="WelcomeEulaDlg2" Event="NewDialog" Value="GetParamsData" Control="GoAhead"></Publish>
       
       
       <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />

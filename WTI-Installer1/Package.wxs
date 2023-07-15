@@ -97,6 +97,21 @@
           </RegistryValue>
         </RegistryKey>
       </Component>
+
+      <Component Directory="PACK1" Id="RegX" Guid="f4052489-052c-458d-9576-77af8cefd10d">
+        <RegistryKey Root="HKLM" Key="Software\WTI">
+          <RegistryValue Name="X" Type="string" KeyPath="yes" Value="[XVALUE]">
+          </RegistryValue>
+        </RegistryKey>
+      </Component>
+
+      <Component Directory="PACK1" Id="RegY" Guid="0a738d84-a41b-4ee1-97b3-a1c0f69ac19e">
+        <RegistryKey Root="HKLM" Key="Software\WTI">
+          <RegistryValue Name="Y" Type="string" KeyPath="yes" Value="[YVALUE]">
+          </RegistryValue>
+        </RegistryKey>
+      </Component>
+      
     </ComponentGroup>
   </Fragment>
     <Fragment>
