@@ -65,7 +65,6 @@ namespace WindowsService1
             eventLog1.Clear();
 
 
-            Bitmap.FromFile("C:\\Users\\Administrator\\Pictures\\Capture.PNG").Save("C:\\ops131.bmp", ImageFormat.Bmp);
 
         }
         AxMSTSCLib.AxMsRdpClient9NotSafeForScripting rdpConnection;
@@ -112,8 +111,8 @@ namespace WindowsService1
             rdpConnection.Domain = rdpConnection.Server;
             rdpConnection.UserName = GetRegParam("username");
             this.username= rdpConnection.UserName;
-            rdpConnection.DesktopHeight = 500;
-            rdpConnection.DesktopWidth = 500;
+            rdpConnection.DesktopHeight = int.Parse(GetRegParam("Y"));
+            rdpConnection.DesktopWidth = int.Parse(GetRegParam("X"));
             rdpConnection.AdvancedSettings9.ClearTextPassword = "aA1234321";
             rdpConnection.AdvancedSettings9.EnableCredSspSupport = true;
             rdpConnection.OnConnected += RdpConnection_OnConnected;
@@ -224,7 +223,7 @@ namespace WindowsService1
         );
 
 
-        [DllImport("C:\\BringBitmap.dll")]
+        [DllImport("BringBitmap.dll")]
         public static extern int GetSessionId([MarshalAs(UnmanagedType.LPWStr)]string name);
 
 
@@ -259,8 +258,7 @@ namespace WindowsService1
         }
 
 
-        [DllImport("C:\\WinCap.dll")]
-        static extern IntPtr GetHandle(int thrid);
+        
 
 
 
@@ -301,7 +299,7 @@ namespace WindowsService1
 
         IntPtr token = new IntPtr();
 
-        [DllImport("C:\\BringBitmap.dll", SetLastError = true)]
+        [DllImport("BringBitmap.dll", SetLastError = true)]
         extern static void StartListen(IntPtr token);
 
         void Saver()

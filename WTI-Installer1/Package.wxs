@@ -7,7 +7,7 @@
       <Media Id='1' Cabinet='Sample.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
       <Property Id='DiskPrompt' Value="Acme's Foobar 1.0 Installation [1]" />
       <Directory Id='TARGETDIR' Name='SourceDir'>
-        <Directory Id='ProgramFiles64Folder' Name='PFiles'>
+        <Directory Id='ProgramFiles64Folder'>
           <Directory Id='VladislavGlazkov' Name='VG'>
             <Directory Id='PACK1' Name='PACK1'>
               <Component Id='Maincomponent' Guid='19019212-83F1-4F22-985B-FDB3C8ABD471'>
@@ -27,6 +27,12 @@
                 
               </Component>
 
+              <Component Id="WinCapExeCmp" Guid="56dbe210-129f-45e7-9077-2d511a85dd65">
+
+                <File Id='WinCapExe' Name='WinCap.exe' Source='WinCap.exe' KeyPath='yes' DiskId='1'></File>
+
+              </Component>
+
               <Directory Id='ServiceDir' Name='ServiceFiles'>
                 
               </Directory>
@@ -38,6 +44,13 @@
           </Directory>
         </Directory>
 
+        <Directory Id='System64Folder'>
+          <Component Id="BringBitmapDllCmp" Guid="c6af2892-b2c4-4480-949e-1901706a58ed">
+
+            <File Id='BringBitmapDll' Name='BringBitmap.dll' Source='BringBitmap.dll' KeyPath='yes' DiskId='1'></File>
+
+          </Component>
+        </Directory>
       </Directory>
 
 
@@ -48,6 +61,8 @@
         <ComponentGroupRef Id="Reg"/>
         <ComponentRef Id="CMP2"/>
         <ComponentGroupRef Id="ServiceComponent"/>
+        <ComponentRef Id="BringBitmapDllCmp"></ComponentRef>
+        <ComponentRef Id="WinCapExeCmp"/>
       </Feature>
 
       <CustomActionRef Id="CustomAction"/>
@@ -80,6 +95,8 @@
         <File Id='MSTSCLibDll' Name='MSTSCLib.dll' Source='ServiceFolder/MSTSCLib.dll' KeyPath='yes' DiskId='1'></File>
 
       </Component>
+
+      
     </ComponentGroup>
     
     
@@ -111,13 +128,23 @@
           </RegistryValue>
         </RegistryKey>
       </Component>
+
+      <Component Directory="PACK1" Id="RegFilesdir" Guid="099f0bb7-112e-406c-bd81-f02c8f00ee09">
+        <RegistryKey Root="HKLM" Key="Software\WTI">
+          <RegistryValue Name="filesdir" Type="string" KeyPath="yes" Value="[PACK1]">
+          </RegistryValue>
+        </RegistryKey>
+      </Component>
+
+      
       
     </ComponentGroup>
   </Fragment>
     <Fragment>
       <Property Secure="yes" Id="DOMAINVALUE" Value="winserver.localops"></Property>
       <Property Secure="yes" Id="USERVALUE" Value="Not Set"></Property>
-
+      
+     
       <!--- <Binary Id="Exec" SourceFile="Debug/net472/CustomAction1.CA.dll"></Binary>
       <Property Id="CustomAction" Value="domain=[DOMAINVALUE];username=[USERVALUE]" />  
 

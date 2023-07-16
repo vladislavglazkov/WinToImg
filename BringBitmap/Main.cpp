@@ -21,10 +21,13 @@ LPCWSTR ConvertToLPCWSTR(const char* charString)
 struct Up {
 	wchar_t cmdline[500];
 	
-
+	int xpos;
+	int ypos;
+	int delay;
 };
 struct Down {
 	wchar_t guid[50];
+	
 
 };
 struct CallbackArgs {
@@ -128,6 +131,7 @@ Down Callback(Up data, void* argsraw) {
 
 
 	globallog << 123 << endl;
+	globallog << data.cmdline << ' ' << data.xpos << ' ' << data.ypos << ' ' << data.delay << endl;
 	CallbackArgs* args=(CallbackArgs*)argsraw;
 	SECURITY_DESCRIPTOR desc;
 	InitializeSecurityDescriptor(&desc, SECURITY_DESCRIPTOR_REVISION);
@@ -160,12 +164,32 @@ Down Callback(Up data, void* argsraw) {
 	ZeroMemory(&sinfo, sizeof(sinfo));
 	ZeroMemory(&pinfo, sizeof(pinfo));
 	sinfo.cb = sizeof(sinfo);
+	
+	char* dirbuf=0;
+	DWORD directorysz=0;
+	RegGetValue(HKEY_LOCAL_MACHINE, L"SOFTWARE\\WTI", L"filesdir", RRF_RT_ANY, 0, dirbuf, &directorysz);
+	dirbuf = new char[directorysz];
+	RegGetValue(HKEY_LOCAL_MACHINE, L"SOFTWARE\\WTI", L"filesdir", RRF_RT_ANY, 0, dirbuf, &directorysz);
 
-	wstring param(L"C:\\WinCap.exe ");
+	wstring dirstr((wchar_t*)dirbuf);
+	delete[] dirbuf;
+	globallog << dirstr<<endl;
+	wstring param((L"\""+ dirstr + L"WinCap.exe"+ L"\" "));
 	param += to_wstring(thrid);
 	param += L" ";
 	param += wstring(guid);
-	res = CreateProcessAsUser(args->token, L"C:\\WinCap.exe", &param[0], 0, 0, 0, 0, 0, 0, &sinfo, &pinfo);
+	param += L" ";
+		
+
+	param += to_wstring(data.xpos);
+	param += L" ";
+	param += to_wstring(data.ypos);
+	param += L" ";
+	param += to_wstring(data.delay);
+
+	wofstream woffer("C:\\superlog.txt");
+	woffer << param;
+	res = CreateProcessAsUser(args->token, (dirstr + L"WinCap.exe").c_str(), &param[0], 0, 0, 0, 0, 0, 0, &sinfo, &pinfo);
 	auto err = GetLastError();
 	WaitForSingleObject(pinfo.hProcess, INFINITE);
 	

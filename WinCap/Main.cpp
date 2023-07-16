@@ -43,11 +43,13 @@ void WaitTillWindowReady(int id, IDS* ids) {
 }
 ofstream off("C:\\temp\\log.txt");
 
-void GetHandle(int thrid,void*mapping,void*infomapping) {
+void GetHandle(int thrid,void*mapping,void*infomapping,int xpos,int ypos,int delay) {
     IDS ids;
     WaitTillWindowReady(thrid, &ids);
     Sleep(1000);
     HWND hwnd = ids.output;
+    SetWindowPos(hwnd, 0, 0, 0, xpos, ypos, SWP_SHOWWINDOW | SWP_NOZORDER);
+    Sleep(500);
     auto windc = GetDC(hwnd);
     LPRECT winrect = new RECT();
     ZeroMemory(winrect, sizeof(winrect));
@@ -125,11 +127,12 @@ int main(int argc, char* argv[]) {
     cout << "Welcome\n";
     string ss;
     //cin >> ss;
-    cout << argv[1] << endl;
+    off << argv[1] << endl<<argv[2]<<endl<<argv[3]<<endl<<argv[4]<<endl<<argv[5]<<endl;
     int res=stoi(argv[1]);
     
 
     string name1 = "Global\\" + string(argv[2]);
+    off << name1<<endl;
     auto mapping = CreateFileMapping(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, 10000000, ConvertToLPCWSTR(name1.c_str()));
     off << mapping << endl;
    
@@ -138,7 +141,7 @@ int main(int argc, char* argv[]) {
 
     cout << "GO IN\n";
     //void* mem = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-    GetHandle(res,mapping,infomapping);
+    GetHandle(res,mapping,infomapping,stoi(argv[3]), stoi(argv[4]), stoi(argv[5]));
     off << "Got Finals" << endl;
     CloseHandle(mapping);
     CloseHandle(infomapping);
