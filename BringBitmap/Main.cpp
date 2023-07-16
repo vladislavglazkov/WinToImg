@@ -158,7 +158,7 @@ Down Callback(Up data, void* argsraw) {
 	
 	
 	auto res = CreateProcessAsUser(args->token,0, data.cmdline, 0, 0, 0, 0, 0, 0, &sinfo, &pinfo);
-	int thrid = pinfo.dwThreadId;
+	int thrid = pinfo.dwProcessId;
 	
 	
 	ZeroMemory(&sinfo, sizeof(sinfo));

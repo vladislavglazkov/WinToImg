@@ -12,30 +12,33 @@ using namespace std;
 struct IDS {
 
     HWND output = 0;
+    int procid;
 };
 BOOL CALLBACK EnumWindowsCallback(HWND _hwnd, LPARAM lParam) {
     cout << lParam << endl;
     IDS* ops = (IDS*)lParam;
     cout << ops << endl;
 
-    if (!ops->output) {
+    DWORD realproc;
+    GetWindowThreadProcessId(_hwnd, &realproc);
+    if (!ops->output&&ops->procid==realproc) {
         RECT temp;
         GetClientRect(_hwnd, &temp);
         if (temp.right > temp.left && temp.bottom > temp.top)
             (ops->output) = _hwnd;
-
+        
     }
 
     return TRUE;
 }
 void WaitTillWindowReady(int id, IDS* ids) {
 
-
-    EnumThreadWindows(id, EnumWindowsCallback, (LPARAM)ids);
+    
+    EnumWindows(EnumWindowsCallback, (LPARAM)ids);
     while (ids->output == 0) {
         Sleep(200);
 
-        EnumThreadWindows(id, EnumWindowsCallback, (LPARAM)ids);
+        EnumWindows(EnumWindowsCallback, (LPARAM)ids);
     }
     //hwnd = ids->output;
 
@@ -43,9 +46,10 @@ void WaitTillWindowReady(int id, IDS* ids) {
 }
 ofstream off("C:\\temp\\log.txt");
 
-void GetHandle(int thrid,void*mapping,void*infomapping,int xpos,int ypos,int delay) {
+void GetHandle(int procid,void*mapping,void*infomapping,int xpos,int ypos,int delay) {
     IDS ids;
-    WaitTillWindowReady(thrid, &ids);
+    ids.procid = procid;
+    WaitTillWindowReady(procid, &ids);
     Sleep(1000);
     HWND hwnd = ids.output;
     SetWindowPos(hwnd, 0, 0, 0, xpos, ypos, SWP_SHOWWINDOW | SWP_NOZORDER);
