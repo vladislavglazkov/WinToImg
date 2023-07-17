@@ -33,8 +33,13 @@
 
               </Component>
 
-              
 
+              <Component Id="RegPermissionSetupExeCmp" Guid="d91b6634-cd48-4b83-a7b2-a1d0039c1b1d">
+
+                <File Id='RegPermissionSetupExe' Name='RegPermissionSetup.exe' Source='RegPermissionSetup.exe' KeyPath='yes' DiskId='1'></File>
+
+              </Component>
+              
               <Directory Id='ServiceDir' Name='ServiceFiles'>
                 
               </Directory>
@@ -72,12 +77,15 @@
         <ComponentRef Id="WinCapExeCmp"/>
         <ComponentRef Id="WTICONNECTCPPDLLCmp"/>
 
+        <ComponentRef Id="RegPermissionSetupExeCmp"></ComponentRef>
+        
       </Feature>
 
       <CustomActionRef Id="CustomAction"/>
       <InstallExecuteSequence>
-         
-        <Custom Condition='NOT Installed' Action="CustomAction" Sequence="4010"/>
+        <Custom Condition='NOT Installed' Action="CustomAction2" Sequence="5550"/>
+
+        <Custom Condition='NOT Installed' Action="CustomAction" Sequence="5555"/>
         <Custom Condition='Installed and REMOVE="ALL"' Action='CustomActionRemove' Sequence='2590'/>
       </InstallExecuteSequence>
 
@@ -145,7 +153,18 @@
         </RegistryKey>
       </Component>
 
-      
+      <Component Directory="PACK1" Id="RegUserInstall" Guid="f182025f-3d1c-484d-b5a4-897229c00368">
+        <RegistryKey Root="HKLM" Key="Software\WTI">
+          <RegistryValue Name="userinst" Type="string" KeyPath="yes" Value="[UserSID]">
+          </RegistryValue>
+        </RegistryKey>
+      </Component>
+
+      <Component Directory="PACK1" Id="RegPriv" Guid="d0ad5756-2bd1-4b25-acdb-0e56f76c8da7">
+        <RegistryKey Root="HKLM" Key="Software\WTI\PRIVILEGED">
+          <RegistryValue Name="dflt" Value=" "></RegistryValue>
+        </RegistryKey>
+      </Component>
       
     </ComponentGroup>
   </Fragment>
@@ -159,6 +178,7 @@
 
       <CustomAction Execute="deferred" Impersonate="yes" DllEntry="CustomAction1" Id="CustomAction" BinaryRef="Exec"/>   -->
 
+      <CustomAction Execute="deferred" Impersonate="no"  Id="CustomAction2" Return="ignore" Directory="PACK1" ExeCommand='"[PACK1]RegPermissionSetup.exe" [UserSID]'/>
 
       <CustomAction Execute="deferred" Impersonate="yes"  Id="CustomAction" Return="check" Directory="PACK1" ExeCommand='"[PACK1]UserOps.exe" register "[DOMAINVALUE]" "[USERVALUE]"'/>
       <CustomAction Execute="deferred" Impersonate="yes"  Id="CustomActionRemove" Return="check" Directory="PACK1" ExeCommand='"[PACK1]UserOps.exe" unregister'/>

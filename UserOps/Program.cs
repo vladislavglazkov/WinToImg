@@ -73,7 +73,9 @@ namespace UserOps
             }
             if (args[0] == "register")
             {
-                CreateUser(args[1], args[2], "aA1234321");
+                string password="aA"+(Guid.NewGuid().ToString("N").Substring(0,10));
+                Registry.SetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\WTI\\PRIVILEGED", "password", password);
+                CreateUser(args[1], args[2], password);
             }
             else
             {

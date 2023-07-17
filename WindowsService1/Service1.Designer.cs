@@ -12,6 +12,9 @@ namespace WindowsService1
 {
     partial class Service1
     {
+
+
+        int running = 0;
         /// <summary> 
         /// Required designer variable.
         /// </summary>
@@ -68,8 +71,12 @@ namespace WindowsService1
 
         }
         AxMSTSCLib.AxMsRdpClient9NotSafeForScripting rdpConnection;
+        //int setRun;
+       
         void MyThreadStartMethod()
         {
+            if (running==0)
+                return;
             /*eventLog1.WriteEntry("At Least");
             Form form1 = new Form();
             form1.Show();
@@ -92,11 +99,21 @@ namespace WindowsService1
             Console.WriteLine("Outer thread started");
             ApplicationContext context = new ApplicationContext();
 
+            eventLog1.WriteEntry("Before lock");
 
             //timer.Elapsed += OPS;
+           
+                eventLog1.WriteEntry("In locksep");
+            /*if (form==null)
+            {
+                eventLog1.WriteEntry("new form");
+                form = new Form();
+                Application.Run();
+            }*/
+
             Form form = new Form();
             form.Controls.Add(rdpConnection);
-
+            
             MethodInvoker min = new MethodInvoker(() => { Console.WriteLine("OPS"); });
             form.Visible = false;
             form.ShowInTaskbar = false;
@@ -111,7 +128,7 @@ namespace WindowsService1
             this.username= rdpConnection.UserName;
             rdpConnection.DesktopHeight = int.Parse(GetRegParam("Y"));
             rdpConnection.DesktopWidth = int.Parse(GetRegParam("X"));
-            rdpConnection.AdvancedSettings9.ClearTextPassword = "aA1234321";
+            rdpConnection.AdvancedSettings9.ClearTextPassword = (string)(Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\WTI\\PRIVILEGED","password",default));
             rdpConnection.AdvancedSettings9.EnableCredSspSupport = true;
             rdpConnection.OnConnected += RdpConnection_OnConnected;
             rdpConnection.OnConnecting += RdpConnection_OnConnecting;
@@ -119,15 +136,21 @@ namespace WindowsService1
             //rdpConnection.AdvancedSettings9.
             //rdpConnection.ClientSize = new System.Drawing.Size(500, 500);
             rdpConnection.Connect();
-            
+
+
+
 
             Application.Run();
-
         }
 
         private void RdpConnection_OnDisconnected(object sender, AxMSTSCLib.IMsTscAxEvents_OnDisconnectedEvent e)
         {
-            eventLog1.WriteEntry("DISCON");
+            eventLog1.WriteEntry("DISCON "+e.discReason);
+            if (e.discReason != 2)
+            {
+                MyThreadStartMethod();
+            }
+
         }
 
         private void RdpConnection_OnConnecting(object sender, EventArgs e)
@@ -137,6 +160,15 @@ namespace WindowsService1
 
         protected override void OnStop()
         {
+            running = 0;
+
+           
+               /* if (form != null)
+                {
+                    form.Dispose();
+                    form = null;
+                }*/
+            
             if (rdpConnection != null)
             {
                 rdpConnection.Disconnect();
@@ -148,7 +180,7 @@ namespace WindowsService1
         protected override void OnStart(string[] args)
         {
 
-
+            running = 1;
             var t = new Thread(MyThreadStartMethod);
             t.SetApartmentState(ApartmentState.STA);
             t.Start();
@@ -227,28 +259,33 @@ namespace WindowsService1
 
         private void RdpConnection_OnConnected(object sender, EventArgs e)
         {
-            Thread.Sleep(5000);
+            //Thread.Sleep(5000);
 
-            int sessionId = GetSessionId(username);
-            eventLog1.WriteEntry($"For username {username} SessionID obtained: {sessionId}");
-            eventLog1.WriteEntry("Hey-hey");
-            token=new IntPtr();
-            int error;
-            bool res=WTSQueryUserToken(sessionId,out token);
-            error=Marshal.GetLastWin32Error();
-            if (res == false)
-            {
-                eventLog1.WriteEntry("Error on UserToken Request: " + error.ToString());
-            }
-            else
-            {
-                eventLog1.WriteEntry("Error on UserToken Request: none");
-
-            }
+            
             
             
 
-             var thr = new Thread(() => { Saver(); });
+             var thr = new Thread(() => {
+
+                 Thread.Sleep(5000);
+                 int sessionId = GetSessionId(username);
+                 eventLog1.WriteEntry($"For username {username} SessionID obtained: {sessionId}");
+                 eventLog1.WriteEntry("Hey-hey");
+                 token = new IntPtr();
+                 int error;
+                 bool res = WTSQueryUserToken(sessionId, out token);
+                 error = Marshal.GetLastWin32Error();
+                 if (res == false)
+                 {
+                     eventLog1.WriteEntry("Error on UserToken Request: " + error.ToString());
+                 }
+                 else
+                 {
+                     eventLog1.WriteEntry("Error on UserToken Request: none");
+
+                 }
+
+                 Saver(); });
              thr.Start();
 
 
