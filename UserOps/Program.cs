@@ -16,10 +16,8 @@ namespace UserOps
         public static void CreateUser(string domainName, string userName, string password)
         {
 
-            System.IO.FileStream fs = new FileStream("C:\\nNN.txt", FileMode.Create, FileAccess.Write);
-            using (System.IO.StreamWriter writer = new StreamWriter(fs))
-            {
-                writer.WriteLine(System.Environment.UserName);
+            //System.IO.FileStream fs = new FileStream("C:\\nNN.txt", FileMode.Create, FileAccess.Write);
+            
                 try
                 {
                     using (var context = new PrincipalContext(ContextType.Domain, domainName))
@@ -42,9 +40,8 @@ namespace UserOps
                 }
                 catch (Exception ex)
                 {
-                    writer.WriteLine(ex.Message);
                 }
-            }
+            
         }
         static void Clear()
         {

@@ -51,7 +51,7 @@ void WaitTillWindowReady(int id, IDS* ids) {
 
 
 }
-ofstream off("C:\\temp\\log.txt");
+//ofstream off("C:\\temp\\log.txt");
 
 void GetHandle(int procid,void*mapping,void*infomapping,int xpos,int ypos,int delay) {
     IDS ids;
@@ -68,7 +68,7 @@ void GetHandle(int procid,void*mapping,void*infomapping,int xpos,int ypos,int de
     auto rect = GetClientRect(hwnd, winrect);
     int cy = winrect->bottom - winrect->top;
     int cx = winrect->right - winrect->left;
-    off << endl << cy << endl << cx;
+    //off << endl << cy << endl << cx;
 
     auto hbmp = CreateCompatibleBitmap(windc, cx, cy);
     BITMAP bmp;
@@ -83,31 +83,31 @@ void GetHandle(int procid,void*mapping,void*infomapping,int xpos,int ypos,int de
     bmi.bmiHeader.biBitCount = bmp.bmBitsPixel;
     bmi.bmiHeader.biCompression = BI_RGB;
     void* temp;
-    off << "BEFOREDIBSECTOIN" << endl;
+   // off << "BEFOREDIBSECTOIN" << endl;
     auto sharedhbmp = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, &temp, mapping, 0);
-    off << "AFTERDIBSECTION" << endl;
+   // off << "AFTERDIBSECTION" << endl;
 
 
     void* ptr = MapViewOfFile(infomapping, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(bmi));
     if (ptr == 0) {
-        off << "ERRR" << endl << GetLastError() << endl;
+     //   off << "ERRR" << endl << GetLastError() << endl;
     }
-    off << "AFTERMAPPING2" << endl;
+  //  off << "AFTERMAPPING2" << endl;
 
     CopyMemory(ptr, &bmi, sizeof(bmi));
-    off << "ONCOPY" << endl;
+   // off << "ONCOPY" << endl;
     UnmapViewOfFile(ptr);
-    off << "Precreate" << endl;
+  //  off << "Precreate" << endl;
 
 
     auto bmpdc = CreateCompatibleDC(windc);
-    off << "Preselect" << endl;
+  //  off << "Preselect" << endl;
 
     auto oldbmp = SelectObject(bmpdc, sharedhbmp);
-    off << "PreCopied" << endl;
+  //  off << "PreCopied" << endl;
 
     BitBlt(bmpdc, 0, 0, cx, cy, windc, 0, 0, SRCCOPY);
-    off << "COPIED" << endl;
+  //  off << "COPIED" << endl;
 
     SelectObject(bmpdc, oldbmp);
     DeleteObject(hbmp);
@@ -133,27 +133,27 @@ LPCWSTR ConvertToLPCWSTR(const char* charString)
 
 
 int main(int argc, char* argv[]) {
-    off << "Hi" << endl;
+    //off << "Hi" << endl;
 
     cout << "Welcome\n";
     string ss;
     //cin >> ss;
-    off << argv[1] << endl<<argv[2]<<endl<<argv[3]<<endl<<argv[4]<<endl<<argv[5]<<endl;
+  //  off << argv[1] << endl<<argv[2]<<endl<<argv[3]<<endl<<argv[4]<<endl<<argv[5]<<endl;
     int res=stoi(argv[1]);
     
 
     string name1 = "Global\\" + string(argv[2]);
-    off << name1<<endl;
+   // off << name1<<endl;
     auto mapping = CreateFileMapping(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, 10000000, ConvertToLPCWSTR(name1.c_str()));
-    off << mapping << endl;
+ //   off << mapping << endl;
    
     auto infomapping = CreateFileMappingW(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, sizeof(BITMAPINFO), ConvertToLPCWSTR((name1+ "alpha").c_str()));
-    off << "Mappings good" << endl;
+  //  off << "Mappings good" << endl;
 
     cout << "GO IN\n";
     //void* mem = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     GetHandle(res,mapping,infomapping,stoi(argv[3]), stoi(argv[4]), stoi(argv[5]));
-    off << "Got Finals" << endl;
+  //  off << "Got Finals" << endl;
     CloseHandle(mapping);
     CloseHandle(infomapping);
 

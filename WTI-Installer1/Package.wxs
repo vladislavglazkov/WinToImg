@@ -93,7 +93,7 @@
         <File Id='WindowsService1Exe' Name='WindowsService1.exe' Source='ServiceFolder/WindowsService1.exe' KeyPath='yes' DiskId='1'></File>
         <ServiceInstall  ErrorControl='normal' Start='auto' Account='LocalSystem' Name='WTIService' DisplayName='WTIService' Id='Service' Type='ownProcess' Vital='yes' Description='WTI daemon'></ServiceInstall>
         <ServiceControl Id="ServiceControl" Start="install" Stop="both" Remove="uninstall"
-        Name="Service 1" Wait="yes" />
+        Name="WTIService" Wait="yes" />
       
       </Component>
       <Component Directory="ServiceDir" Guid="d43d2be4-9502-4b01-9012-ab50f77d85db">

@@ -23,7 +23,7 @@ namespace WindowsService1
 
             processInstaller.Account = ServiceAccount.LocalSystem;
             serviceInstaller.StartType = ServiceStartMode.Manual;
-            serviceInstaller.ServiceName = "Service1";
+            serviceInstaller.ServiceName = "WTIService";
             Installers.Add(processInstaller);
             Installers.Add(serviceInstaller);
         }

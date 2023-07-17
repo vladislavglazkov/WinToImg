@@ -11,7 +11,7 @@
 #include <string>
 #include <fstream>
 using namespace std;
-wofstream globallog("C:\\logging.txt");
+//wofstream globallog("C:\\logging.txt");
 
 struct AcceptViaPipeCallbackData {
 	LPCWSTR pipename;
@@ -25,7 +25,7 @@ struct AcceptViaPipeCallbackData {
 template <typename UpType, typename DownType>
 DWORD WINAPI AcceptViaPipeCallback(LPVOID arg) {
 	//globallog << "IN CALLBACK"<<endl;
-	globallog << wstring(L"IN CALLBACK FOR ") + ((AcceptViaPipeCallbackData*)arg)->pipename + L"\n" << endl;
+	//globallog << wstring(L"IN CALLBACK FOR ") + ((AcceptViaPipeCallbackData*)arg)->pipename + L"\n" << endl;
 	SECURITY_DESCRIPTOR desc;
 	InitializeSecurityDescriptor(&desc, SECURITY_DESCRIPTOR_REVISION);
 	ACL* acl = (ACL*)new char[1000];
@@ -51,8 +51,8 @@ DWORD WINAPI AcceptViaPipeCallback(LPVOID arg) {
 	LocalFree(sid);
 	delete[] acl;
 
-	if (pipe == 0)
-		globallog << L"ERROR!"<<endl;
+	/*if (pipe == 0)
+		globallog << L"ERROR!"<<endl;*/
 	auto succ=ConnectNamedPipe(pipe, 0);
 	if (!succ) {
 		throw std::runtime_error("Couldn't connect to pipe as server. Win32 code: " + to_string(GetLastError()));
@@ -62,12 +62,12 @@ DWORD WINAPI AcceptViaPipeCallback(LPVOID arg) {
 		CreateThread(0, 0, AcceptViaPipeCallback<UpType, DownType>, arg, 0, 0);
 	}
 
-	globallog << L"Connected"<<endl;
+	//globallog << L"Connected"<<endl;
 	int bufsize = sizeof(UpType);
 	UpType buf;
 	DWORD act;
 	ReadFile(pipe, &buf, bufsize, &act, 0);
-	globallog << L"LET THE TRUTH OUT" << endl;
+	//globallog << L"LET THE TRUTH OUT" << endl;
 	
 	string ss = "OPS";
 	//Sleep(0);
@@ -120,7 +120,7 @@ void AcceptViaPipe(LPCWSTR pipename, int simul,bool reopen, DownType(*func)(UpTy
 		auto hdlr=CreateThread(0, 0, AcceptViaPipeCallback<UpType, DownType>, data, 0, 0);
 		hdlrs[i] = hdlr;
 		if (hdlr == 0) {
-			globallog << wstring(L"FAILED START THREAD FOR ") + pipename << endl;
+			//globallog << wstring(L"FAILED START THREAD FOR ") + pipename << endl;
 
 		}
 		else {

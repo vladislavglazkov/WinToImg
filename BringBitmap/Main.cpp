@@ -112,13 +112,13 @@ Empty DeleteCallback(Empty data, void* argsraw) {
 }
 
 DWORD WINAPI TEST(LPVOID arg) {
-	globallog << "TEST PASSED" << endl;
+	//globallog << "TEST PASSED" << endl;
 	return 0;
 }
 
 void CleanUpNameCallback(void* arg) {
 	delete[] arg;
-	globallog << L"Released\n";
+	//globallog << L"Released\n";
 }
 
 Down Callback(Up data, void* argsraw) {
@@ -130,8 +130,8 @@ Down Callback(Up data, void* argsraw) {
 
 
 
-	globallog << 123 << endl;
-	globallog << data.cmdline << ' ' << data.xpos << ' ' << data.ypos << ' ' << data.delay << endl;
+	//globallog << 123 << endl;
+	//globallog << data.cmdline << ' ' << data.xpos << ' ' << data.ypos << ' ' << data.delay << endl;
 	CallbackArgs* args=(CallbackArgs*)argsraw;
 	SECURITY_DESCRIPTOR desc;
 	InitializeSecurityDescriptor(&desc, SECURITY_DESCRIPTOR_REVISION);
@@ -153,10 +153,10 @@ Down Callback(Up data, void* argsraw) {
 	ZeroMemory(&sinfo, sizeof(sinfo));
 	ZeroMemory(&pinfo, sizeof(pinfo));
 	sinfo.cb = sizeof(sinfo);
-	globallog << "PRE-REACHED" << endl;
+	//globallog << "PRE-REACHED" << endl;
 	
 	
-	globallog << "REACHED" << endl;
+	//globallog << "REACHED" << endl;
 	
 	
 	auto res = CreateProcessAsUser(args->token,0, data.cmdline, 0, 0, 0, 0, 0, 0, &sinfo, &pinfo);
@@ -175,7 +175,7 @@ Down Callback(Up data, void* argsraw) {
 
 	wstring dirstr((wchar_t*)dirbuf);
 	delete[] dirbuf;
-	globallog << dirstr<<endl;
+	//globallog << dirstr<<endl;
 	wstring param((L"\""+ dirstr + L"WinCap.exe"+ L"\" "));
 	param += to_wstring(thrid);
 	param += L" ";
@@ -189,8 +189,8 @@ Down Callback(Up data, void* argsraw) {
 	param += L" ";
 	param += to_wstring(data.delay);
 
-	wofstream woffer("C:\\superlog.txt");
-	woffer << param;
+	//wofstream woffer("C:\\superlog.txt");
+	//woffer << param;
 	res = CreateProcessAsUser(args->token, (dirstr + L"WinCap.exe").c_str(), &param[0], 0, 0, 0, 0, 0, 0, &sinfo, &pinfo);
 	auto err = GetLastError();
 	WaitForSingleObject(pinfo.hProcess, INFINITE);
@@ -232,24 +232,24 @@ extern "C" __declspec(dllexport) void StartListen(HANDLE token) {
 
 
 extern "C" __declspec(dllexport) int GetSessionId(LPCWSTR username) {
-	ofstream off("C:\\GSI.log");
+	//ofstream off("C:\\GSI.log");
 	WTS_SESSION_INFO* infos;
 	DWORD size = 0;
 	int ans = -1;
 	
 	for (const wchar_t* idx = username; *idx != 0; idx++) {
-		off << (int)(*idx)<<' ';
+		//off << (int)(*idx)<<' ';
 	}
-	off << endl << endl;
+	//off << endl << endl;
 	WTSEnumerateSessions(0, 0, 1, &infos, &size);
 	for (int i = 0; i < size; i++) {
 		LPWSTR buf;
 		DWORD bufsize;
 		WTSQuerySessionInformation(0, infos[i].SessionId, WTSUserName, &buf, &bufsize);
 		for (const wchar_t* idx = buf; *idx != 0; idx++) {
-			off << (int)(*idx) << ' ';
+			//off << (int)(*idx) << ' ';
 		}
-		off << endl << endl;
+		//off << endl << endl;
 		if (lstrcmpi(username, buf)==0) {
 			ans = infos[i].SessionId;
 		}

@@ -52,7 +52,7 @@ namespace WindowsService1
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            this.ServiceName = "Service1";
+            this.ServiceName = "WTIService";
             eventLog1 = new System.Diagnostics.EventLog();
             
             if (!System.Diagnostics.EventLog.SourceExists("MySource"))
@@ -93,9 +93,7 @@ namespace WindowsService1
             ApplicationContext context = new ApplicationContext();
 
 
-            System.Timers.Timer timer = new System.Timers.Timer(1000);
             //timer.Elapsed += OPS;
-            timer.Start();
             Form form = new Form();
             form.Controls.Add(rdpConnection);
 
