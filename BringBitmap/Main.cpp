@@ -145,6 +145,8 @@ Down Callback(Up data, void* argsraw) {
 	wstring guid = GenerateGUIDString();
 	auto infomapping = CreateFileMapping(INVALID_HANDLE_VALUE, &atrs, PAGE_READWRITE, 0, sizeof(BITMAPINFO), (L"Global\\" + guid + L"alpha").c_str());
 	auto mapping = CreateFileMapping(INVALID_HANDLE_VALUE, &atrs, PAGE_READWRITE, 0, 10000000, (L"Global\\" + guid).c_str());
+	
+
 
 	STARTUPINFO sinfo;
 	PROCESS_INFORMATION pinfo;
@@ -152,14 +154,14 @@ Down Callback(Up data, void* argsraw) {
 	ZeroMemory(&pinfo, sizeof(pinfo));
 	sinfo.cb = sizeof(sinfo);
 	globallog << "PRE-REACHED" << endl;
-
+	
 	
 	globallog << "REACHED" << endl;
 	
 	
 	auto res = CreateProcessAsUser(args->token,0, data.cmdline, 0, 0, 0, 0, 0, 0, &sinfo, &pinfo);
 	int thrid = pinfo.dwProcessId;
-	
+	HANDLE hProc = pinfo.hProcess;
 	
 	ZeroMemory(&sinfo, sizeof(sinfo));
 	ZeroMemory(&pinfo, sizeof(pinfo));
@@ -192,7 +194,7 @@ Down Callback(Up data, void* argsraw) {
 	res = CreateProcessAsUser(args->token, (dirstr + L"WinCap.exe").c_str(), &param[0], 0, 0, 0, 0, 0, 0, &sinfo, &pinfo);
 	auto err = GetLastError();
 	WaitForSingleObject(pinfo.hProcess, INFINITE);
-	
+	TerminateProcess(hProc,0);
 	Down ans;
 	ZeroMemory(&ans, sizeof(ans));
 	guid.copy(&(ans.guid[0]), guid.length());

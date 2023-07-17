@@ -21,9 +21,16 @@ BOOL CALLBACK EnumWindowsCallback(HWND _hwnd, LPARAM lParam) {
 
     DWORD realproc;
     GetWindowThreadProcessId(_hwnd, &realproc);
+    
     if (!ops->output&&ops->procid==realproc) {
         RECT temp;
         GetClientRect(_hwnd, &temp);
+
+        wchar_t classnamebuf[300];
+        GetClassName(_hwnd, classnamebuf, 300);
+        if (lstrcmpiW(classnamebuf, L"ConsoleWindowClass") == 0 || lstrcmpiW(classnamebuf, L"PseudoConsoleWindow") == 0)
+            return 0;
+
         if (temp.right > temp.left && temp.bottom > temp.top)
             (ops->output) = _hwnd;
         
@@ -50,10 +57,10 @@ void GetHandle(int procid,void*mapping,void*infomapping,int xpos,int ypos,int de
     IDS ids;
     ids.procid = procid;
     WaitTillWindowReady(procid, &ids);
-    Sleep(1000);
+    Sleep(delay);
     HWND hwnd = ids.output;
     SetWindowPos(hwnd, 0, 0, 0, xpos, ypos, SWP_SHOWWINDOW | SWP_NOZORDER);
-    Sleep(500);
+    Sleep(100);
     auto windc = GetDC(hwnd);
     LPRECT winrect = new RECT();
     ZeroMemory(winrect, sizeof(winrect));
@@ -149,7 +156,6 @@ int main(int argc, char* argv[]) {
     off << "Got Finals" << endl;
     CloseHandle(mapping);
     CloseHandle(infomapping);
-
 
     
     

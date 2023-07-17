@@ -33,6 +33,8 @@
 
               </Component>
 
+              
+
               <Directory Id='ServiceDir' Name='ServiceFiles'>
                 
               </Directory>
@@ -45,6 +47,11 @@
         </Directory>
 
         <Directory Id='System64Folder'>
+          <Component Id="WTICONNECTCPPDLLCmp" Guid="83e6acc6-47e3-4bdc-b645-216773124dcd">
+
+            <File Id='WTICONNECTCPPDLL' Name='WTIConnect-CPP.dll' Source='WTIConnect-CPP.dll' KeyPath='yes' DiskId='1'></File>
+
+          </Component>
           <Component Id="BringBitmapDllCmp" Guid="c6af2892-b2c4-4480-949e-1901706a58ed">
 
             <File Id='BringBitmapDll' Name='BringBitmap.dll' Source='BringBitmap.dll' KeyPath='yes' DiskId='1'></File>
@@ -63,6 +70,8 @@
         <ComponentGroupRef Id="ServiceComponent"/>
         <ComponentRef Id="BringBitmapDllCmp"></ComponentRef>
         <ComponentRef Id="WinCapExeCmp"/>
+        <ComponentRef Id="WTICONNECTCPPDLLCmp"/>
+
       </Feature>
 
       <CustomActionRef Id="CustomAction"/>
@@ -82,7 +91,7 @@
     <ComponentGroup Id="ServiceComponent">
       <Component Directory="ServiceDir" Guid="d454b7e6-5105-42de-a989-5c0109551d91">
         <File Id='WindowsService1Exe' Name='WindowsService1.exe' Source='ServiceFolder/WindowsService1.exe' KeyPath='yes' DiskId='1'></File>
-        <ServiceInstall  ErrorControl='normal' Start='auto' Account='LocalSystem' Name='Service 1' DisplayName='Service 1' Id='Service' Type='ownProcess' Vital='yes' Description='WTI daemon'></ServiceInstall>
+        <ServiceInstall  ErrorControl='normal' Start='auto' Account='LocalSystem' Name='WTIService' DisplayName='WTIService' Id='Service' Type='ownProcess' Vital='yes' Description='WTI daemon'></ServiceInstall>
         <ServiceControl Id="ServiceControl" Start="install" Stop="both" Remove="uninstall"
         Name="Service 1" Wait="yes" />
       
