@@ -8,11 +8,11 @@ using System.Threading;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
 
-namespace WTIConnect
+namespace WTI
 {
 
 
-    public static class WTI
+    public static class WTIConnect
     {
         [DllImport("WTIConnect-CPP.dll")]
         static extern IntPtr OPS([MarshalAs(UnmanagedType.LPWStr)]string cmdline,int xSize,int ySize,int delay);

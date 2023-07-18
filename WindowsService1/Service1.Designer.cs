@@ -12,9 +12,6 @@ namespace WindowsService1
 {
     partial class Service1
     {
-
-
-        int running = 0;
         /// <summary> 
         /// Required designer variable.
         /// </summary>
@@ -24,6 +21,9 @@ namespace WindowsService1
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        /// 
+
+        int running = 0;
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -48,7 +48,7 @@ namespace WindowsService1
             string route = "HKEY_LOCAL_MACHINE\\SOFTWARE\\WTI";
             return (string)Registry.GetValue(route, param, default);
 
-            
+
         }
         private string username;
         static System.Diagnostics.EventLog eventLog1;
@@ -57,7 +57,7 @@ namespace WindowsService1
             components = new System.ComponentModel.Container();
             this.ServiceName = "WTIService";
             eventLog1 = new System.Diagnostics.EventLog();
-            
+
             if (!System.Diagnostics.EventLog.SourceExists("MySource"))
             {
                 System.Diagnostics.EventLog.CreateEventSource(
@@ -71,12 +71,18 @@ namespace WindowsService1
 
         }
         AxMSTSCLib.AxMsRdpClient9NotSafeForScripting rdpConnection;
-        //int setRun;
-       
+        Form form=null;
+        object loop = null;
+
         void MyThreadStartMethod()
         {
-            if (running==0)
+            Thread.Sleep(1000);
+            if (running == 0)
+            {
                 return;
+            }
+            
+            
             /*eventLog1.WriteEntry("At Least");
             Form form1 = new Form();
             form1.Show();
@@ -99,36 +105,31 @@ namespace WindowsService1
             Console.WriteLine("Outer thread started");
             ApplicationContext context = new ApplicationContext();
 
-            eventLog1.WriteEntry("Before lock");
 
-            //timer.Elapsed += OPS;
-           
-                eventLog1.WriteEntry("In locksep");
-            /*if (form==null)
+            if (form != null)
             {
-                eventLog1.WriteEntry("new form");
-                form = new Form();
-                Application.Run();
-            }*/
-
-            Form form = new Form();
+                form.Dispose();
+            }
+            form = new Form();
             form.Controls.Add(rdpConnection);
             
+
             MethodInvoker min = new MethodInvoker(() => { Console.WriteLine("OPS"); });
             form.Visible = false;
             form.ShowInTaskbar = false;
             var hh = form.Handle;
             eventLog1.WriteEntry(hh.ToString());
+            
             form.BeginInvoke(min);
             form.Show();
 
             rdpConnection.Server = GetRegParam("domain");
             rdpConnection.Domain = rdpConnection.Server;
             rdpConnection.UserName = GetRegParam("username");
-            this.username= rdpConnection.UserName;
+            this.username = rdpConnection.UserName;
             rdpConnection.DesktopHeight = int.Parse(GetRegParam("Y"));
             rdpConnection.DesktopWidth = int.Parse(GetRegParam("X"));
-            rdpConnection.AdvancedSettings9.ClearTextPassword = (string)(Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\WTI\\PRIVILEGED","password",default));
+            rdpConnection.AdvancedSettings9.ClearTextPassword = (string)(Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\WTI\\PRIVILEGED", "password", default)); ;
             rdpConnection.AdvancedSettings9.EnableCredSspSupport = true;
             rdpConnection.OnConnected += RdpConnection_OnConnected;
             rdpConnection.OnConnecting += RdpConnection_OnConnecting;
@@ -137,20 +138,35 @@ namespace WindowsService1
             //rdpConnection.ClientSize = new System.Drawing.Size(500, 500);
             rdpConnection.Connect();
 
+            
+
+
+            
+            
+            if (loop == null)
+            {
+                loop = new object();
+                eventLog1.WriteEntry($"NEW LOOP CREATED for thread {Thread.CurrentThread.ManagedThreadId}");
+
+                Application.Run();
+                
+            }
+            else
+            {
+                int bb = 0;
+                int aa= 5 / bb;
+            }
 
 
 
-            Application.Run();
+
         }
 
         private void RdpConnection_OnDisconnected(object sender, AxMSTSCLib.IMsTscAxEvents_OnDisconnectedEvent e)
         {
-            eventLog1.WriteEntry("DISCON "+e.discReason);
-            if (e.discReason != 2)
-            {
-                MyThreadStartMethod();
-            }
-
+            eventLog1.WriteEntry("DISCON");
+            
+            MyThreadStartMethod();
         }
 
         private void RdpConnection_OnConnecting(object sender, EventArgs e)
@@ -160,21 +176,18 @@ namespace WindowsService1
 
         protected override void OnStop()
         {
-            running = 0;
 
-           
-               /* if (form != null)
-                {
-                    form.Dispose();
-                    form = null;
-                }*/
-            
+
+            running = 0;
             if (rdpConnection != null)
             {
                 rdpConnection.Disconnect();
             }
+
+
+           
             base.OnStop();
-            
+
         }
 
         protected override void OnStart(string[] args)
@@ -185,7 +198,7 @@ namespace WindowsService1
             t.SetApartmentState(ApartmentState.STA);
             t.Start();
             eventLog1.WriteEntry("In OnStart.");
-            
+
         }
 
 
@@ -194,13 +207,13 @@ namespace WindowsService1
 
 
 
-       /* [StructLayout(LayoutKind.Sequential)]
-        public struct HANDLE
-        {
-            public IntPtr hHandle;
-            public IntPtr pHandle;
-            public int dwAccessMask;
-        }*/
+        /* [StructLayout(LayoutKind.Sequential)]
+         public struct HANDLE
+         {
+             public IntPtr hHandle;
+             public IntPtr pHandle;
+             public int dwAccessMask;
+         }*/
 
         // Process information structure
         [StructLayout(LayoutKind.Sequential)]
@@ -254,46 +267,41 @@ namespace WindowsService1
 
 
         [DllImport("BringBitmap.dll")]
-        public static extern int GetSessionId([MarshalAs(UnmanagedType.LPWStr)]string name);
+        public static extern int GetSessionId([MarshalAs(UnmanagedType.LPWStr)] string name);
 
 
         private void RdpConnection_OnConnected(object sender, EventArgs e)
         {
-            //Thread.Sleep(5000);
+            Thread.Sleep(5000);
 
-            
-            
-            
+            int sessionId = GetSessionId(username);
+            eventLog1.WriteEntry($"For username {username} SessionID obtained: {sessionId}");
+            eventLog1.WriteEntry("Hey-hey");
+            token = new IntPtr();
+            int error;
+            bool res = WTSQueryUserToken(sessionId, out token);
+            error = Marshal.GetLastWin32Error();
+            if (res == false)
+            {
+                eventLog1.WriteEntry("Error on UserToken Request: " + error.ToString());
+            }
+            else
+            {
+                eventLog1.WriteEntry("Error on UserToken Request: none");
 
-             var thr = new Thread(() => {
-
-                 Thread.Sleep(5000);
-                 int sessionId = GetSessionId(username);
-                 eventLog1.WriteEntry($"For username {username} SessionID obtained: {sessionId}");
-                 eventLog1.WriteEntry("Hey-hey");
-                 token = new IntPtr();
-                 int error;
-                 bool res = WTSQueryUserToken(sessionId, out token);
-                 error = Marshal.GetLastWin32Error();
-                 if (res == false)
-                 {
-                     eventLog1.WriteEntry("Error on UserToken Request: " + error.ToString());
-                 }
-                 else
-                 {
-                     eventLog1.WriteEntry("Error on UserToken Request: none");
-
-                 }
-
-                 Saver(); });
-             thr.Start();
+            }
 
 
-            
+
+            var thr = new Thread(() => { Saver(); });
+            thr.Start();
+
+
+
         }
 
 
-        
+
 
 
 
@@ -308,7 +316,7 @@ namespace WindowsService1
             // Do something with the window handle
 
             // Continue enumeration
-            eventLog1.WriteEntry("WinEnum: "+hWnd.ToString());
+            eventLog1.WriteEntry("WinEnum: " + hWnd.ToString());
             return true;
         }
 
@@ -360,17 +368,17 @@ namespace WindowsService1
                 eventLog1.WriteEntry("Impersonation error: none");
             }*/
 
-            
 
 
-           /* IntPtr finres=OPS(token,thrid);
-            eventLog1.WriteEntry("RECEIVEED");
-            Bitmap bmp=Bitmap.FromHbitmap(finres);
-            eventLog1.WriteEntry("RECEIVEED THEREAFTER");
 
-            eventLog1.WriteEntry(bmp.Height.ToString());
-            eventLog1.WriteEntry(bmp.Width.ToString());
-            bmp.Save("C:\\temp\\image.bmp", ImageFormat.Bmp);*/
+            /* IntPtr finres=OPS(token,thrid);
+             eventLog1.WriteEntry("RECEIVEED");
+             Bitmap bmp=Bitmap.FromHbitmap(finres);
+             eventLog1.WriteEntry("RECEIVEED THEREAFTER");
+
+             eventLog1.WriteEntry(bmp.Height.ToString());
+             eventLog1.WriteEntry(bmp.Width.ToString());
+             bmp.Save("C:\\temp\\image.bmp", ImageFormat.Bmp);*/
 
 
             /*res = CreateProcessAsUser(token, "C:\\WinCap.exe", thrid.ToString()+" "+ops.ToString("N"), IntPtr.Zero, IntPtr.Zero, false, 0, IntPtr.Zero, null, ref info, out pinfo);
@@ -388,7 +396,7 @@ namespace WindowsService1
 
         private void Tm_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            
+
 
         }
 

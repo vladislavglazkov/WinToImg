@@ -76,7 +76,7 @@ Patch dialog sequence:
       </Dialog>
       
        <Dialog Modeless="yes" Id="Progdiag2" Width="370" Height="270" Title="Wait for the installation to complete">
-          <Control TabSkip="no" X="10" Y="10" Height="100" Width="100" Id="ProgressDialog.Text" Type="Text" Text="Stand by"></Control>
+          <Control TabSkip="no" X="10" Y="10" Height="100" Width="100" Id="ProgressDialog.Text" Type="Text" Text="The application is being installed..."></Control>
       
       </Dialog>
       
