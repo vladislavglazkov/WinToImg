@@ -6,8 +6,8 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 The "WTI" package allows to run apps and capture its contents off-screen by maintaining and managing a hidden RDP session.
 
 # PREREQUISITES
-- Windows Server only
-- RDS server should be serviceable and at least one additional license should be available
+- **Windows Server only**
+- Local RDS host should be serviceable and at least one additional client license should be available
 
 # INSTALLATION
 - Run the WTI-Installer1.msi file from the package. **Important: installation must be run by a user privileged to create other domain users (it's not possible to run the installation as a standard user and pass UAC check later)**
@@ -15,7 +15,7 @@ The "WTI" package allows to run apps and capture its contents off-screen by main
 
 # HOW TO USE
 
-In the package, there is a .NET Framework library *WTIConnect.dll*, implementing the namespace *WTIConnect* with the single static class *WTI* having a static method defined as follows:
+In the package, there is a .NET Framework library *WTIConnect.dll*, implementing the namespace *WTI* with the single static class *WTIConnect* having a static method defined as follows:
 
 *static async Task<Bitmap> GetBitmap(string cmdline,int xSize,int ySize,int delay)*
 
@@ -26,6 +26,8 @@ You need to pass
 - requested vertical size of the window 
 - the delay since the window would have been detected to the moment it would be captured (if set too low, not all the contents might draw up properly)
 
+The standard *System.Drawing.Bitmap* object, containing client area of the requested process's window, will be returned. Do not forget to dispose of it after it has been used.
+
 # LIMITATIONS AND KNOWN BUGS
 
 - Error handling mostly absent
@@ -35,7 +37,9 @@ You need to pass
 # IMPORTANT NOTES
 
 - **Software, using WTIConnect.dll must be run in a strictly x64 mode**
-- In case the requested process renders more than one window, any of them might be captured
+- In case the requested process renders more than one window, any of them might be captured. In case the window is rendered by the child process, it will not be captured.
 - In no event will the console window be captured
 - The created process is terminated after the window is captures. However, if child processes had been created, this will not be cleaned up
-- 
+- The created user's credentials will be used to start the requested process. Ensure it is sufficiently privileged.
+- The requested window size is the size of the full window, however, only the client area will be added, therefore, the real image size will be slightly smaller. (Requesting precise client area size - to be added later)
+
